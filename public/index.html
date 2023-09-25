@@ -1,0 +1,158 @@
+<!-- <div id="app"></div> -->
+
+<!DOCTYPE html>
+<html>
+  <style>
+    .wrapper {
+      background-color: lightblue;
+      display: inline-block;
+      justify-content: center;
+    }
+
+    .container {
+      text-align: center;
+      background-color: pink;
+      width: 300px;
+      /* height: 200px; */
+      overflow: hidden;
+      position: relative;
+    }
+
+    .scrollable {
+      display: flex;
+      gap: 5px;
+      white-space: nowrap;
+      font-size: 30px;
+      cursor: grab;
+      transition: transform 0.2s;
+      margin-left: 15px;
+    }
+
+    .card {
+      width: 280px;
+      height: 104px;
+      background-color: white;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      padding: 12px 100px;
+      margin: 5px;
+      gap: 4px;
+
+      background: #ffffff;
+      /* Elevation Large */
+      box-shadow: 0px 5px 6px rgba(0, 0, 0, 0.1),
+        0px 0px 5px 2px rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
+    }
+
+    .bullet-container {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .bullet {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: gray;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+
+    .bullet.active {
+      background-color: green;
+    }
+  </style>
+
+  <body>
+    <div class="wrapper">
+    <div class="container">
+    <div class="scrollable" draggable="true">
+      <div data-id="1" class= "card">primeiro</div>
+      <div data-id="2" class= "card">segundo</div>
+      <div data-id="3" class= "card">terceiro</div>
+      <div data-id="4" class= "card">quarto</div>
+      <div data-id="5" class= "card">quinto</div>
+      <div data-id="6" class= "card">sexto</div>
+      <div data-id="7" class= "card">sétimo</div>
+      <div data-id="8" class= "card">oitavo</div>
+      <div data-id="9" class= "card">nono</div>
+      <div data-id="10" class= "card">décimo</div>
+      <div data-id="11" class= "card">décimo primeiro</div>
+      <div data-id="12" class= "card">décimo segundo</div>
+    </div>
+  </div>
+      </div>
+      <div class="bullet-container" id="bulletContainer">
+        <!-- Bullets serão adicionadas aqui -->
+      </div>
+    </div>
+
+    <script>
+    const container = document.querySelector('.container');
+    const scrollable = document.querySelector('.scrollable');
+    const bulletContainer = document.getElementById('bulletContainer');
+
+    let isScrolling = false;
+    let startPosition = 0;
+    let scrollPosition = 0;
+
+    container.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      isScrolling = true;
+      startPosition = e.clientX;
+      scrollPosition = container.scrollLeft;
+      scrollable.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isScrolling) return;
+      const delta = e.clientX - startPosition;
+      container.scrollLeft = scrollPosition - delta;
+    });
+
+    document.addEventListener('mouseup', () => {
+      isScrolling = false;
+      scrollable.style.cursor = 'grab';
+    });
+
+    // Função para criar bullets com identificação
+    function createBullets() {
+      const divs = document.querySelectorAll('.scrollable > div');
+      divs.forEach((div, index) => {
+        const bullet = document.createElement('div');
+        bullet.className = 'bullet';
+        bullet.dataset.id = div.getAttribute('data-id');
+        bullet.addEventListener('click', () => scrollToDiv(bullet.dataset.id));
+        bulletContainer.appendChild(bullet);
+      });
+    }
+
+    // Função para rolar até a div correspondente à identificação
+    function scrollToDiv(id) {
+      const div = document.querySelector(`.scrollable > div[data-id="${id}"]`);
+      container.scrollLeft = div.offsetLeft;
+    }
+
+    // Atualiza as bullets com base na posição atual do scroll
+    function updateBullets() {
+      const divs = document.querySelectorAll('.scrollable > div');
+      const scrollLeft = container.scrollLeft;
+      divs.forEach((div) => {
+        const bullet = bulletContainer.querySelector(`.bullet[data-id="${div.getAttribute('data-id')}"]`);
+        if (scrollLeft >= div.offsetLeft && scrollLeft < div.offsetLeft + div.clientWidth) {
+          bullet.classList.add('active');
+        } else {
+          bullet.classList.remove('active');
+        }
+      });
+    }
+
+    // Cria as bullets com identificação e atualiza quando o scroll é alterado
+    createBullets();
+    container.addEventListener('scroll', updateBullets);
+  </script>
+  </body>
+</html>
